@@ -116,20 +116,6 @@ body {
   padding: 0px 0px 0px 10px;
 }
 
-#header-img {
-  z-index: 999999999;
-  box-shadow: rgba(0, 0, 0, 0.05) 0px 5px 16px 0px !important;
-  cursor: pointer;
-}
-#options {
-  background-color: #fff;
-  position: absolute;
-  right: 50px;
-  top: 50px;
-  min-width: 250px;
-  min-height: 280px;
-  box-shadow: 0px 0px 3px 1px #555555;
-}
 .avatar {
   border-radius: 50%;
   width: 50px;
@@ -141,16 +127,6 @@ body {
   margin: 0;
 }
 
-.popup {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 500px;
-  height: 500px;
-  border-radius: 10px;
-  box-shadow: 0px 0px 2px 1px #aaa;
-}
 
 .loader,
 .loader:after {
@@ -194,36 +170,69 @@ body {
     transform: rotate(360deg);
   }
 }
-/*
-button {
-  padding: 20px 40px;
-  background: -webkit-linear-gradient(
-    to right,
-    #ec2f4b,
-    #009fff
-  ); 
-  background: linear-gradient(to right, #ec2f4b, #009fff);
+
+#header-img {
+  z-index: 999999999;
+  box-shadow: #444 0px 0px 2px 0px;
+  cursor: pointer;
+  width: 55px;
+  height: 55px;
+  transition: all ease-in 0.2s;
 }
-*/
+#header-img:hover{
+  box-shadow: 0 0 12px 0px  #444;
+  filter: brightness(0.9);
+}
+#options {
+  background-color: #fff;
+  position: absolute;
+  right: 55px;
+  top: 55px;
+  box-shadow: 0px 0px 3px 1px #555555;
+  overflow: hidden;
+  transition: all ease-in 0.1s;
+}
+#options #school-r{
+  margin: 8px 0 8px 0;
+  user-select: none;
+}
+#options #op-name{
+  border-bottom: 2px solid #6200ee;
+}
+.s-id{
+  font-size: smaller;
+  pointer-events: none;
+}
 .s-label {
   padding: 8px;
   min-width: 150px;
-  height: 35px;
   background: #fff;
   cursor: pointer;
+  box-shadow: 0 0 1px 0 #888;
+  transition: all ease-in 0.1s;
 }
 .mdc-button {
   text-transform: none;
   letter-spacing: normal;
 }
 .s-label:hover {
-  background: #bbb;
+  background: #f1f1f1;
+  box-shadow: 0 0 3px 0px #888;
+}
+.s-label:active{
+  background: #d1d1d1;
 }
 .s-icon {
   pointer-events: none;
-  display: none;
+  visibility: hidden;
   float: right;
+  margin: 8px;
 }
 .s-label[selected] {
   background: #009aff96;
+}
+
+#c-error{
+  margin: 6px 0 6px 0;
+  color: red;
 }

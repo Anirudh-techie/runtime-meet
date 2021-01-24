@@ -11,7 +11,6 @@ export var getSchools = async () => {
       }),
     })
   ).json();
- 
 };
 
 export var joinSchool = async (id, role) => {

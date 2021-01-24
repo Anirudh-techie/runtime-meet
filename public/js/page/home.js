@@ -3,22 +3,14 @@ import * as school from "../util/school.js";
 import * as popup from "../util/popup.js";
 import * as button from "../util/button.js";
 import { forEach } from "../util/forEach.js";
+var schools;
+var c_school;
 export var init = async () => {
-  var schools = await school.getSchools();
+  schools = await school.getSchools();
   if (schools.length <= 0) {
-    alert("please create a school!");
+    alert("please create or join a school!");
   }
-  document.getElementById("header-img").onclick = function () {
-    var e = document.getElementById("options");
-    e.hidden = !e.hidden;
-  };
-  document.addEventListener("click", (e) => {
-    var el = document.getElementById("options");
-    var img = document.getElementById("header-img");
-    if (e.target != el && e.target != img) {
-      el.hidden = true;
-    }
-  });
+
   document.querySelectorAll(".mdc-text-field").forEach((e) => {
     new mdc.textField.MDCTextField(e);
   });
@@ -42,6 +34,7 @@ export var init = async () => {
       <div class='s-label' value='${s.id}'>
         ${s.name}
         <i class="material-icons s-icon">check</i>
+        <p class="s-id">id: ${s.id}</p>
       </div>`;
   });
   document.getElementById("join-class").onclick = function () {
@@ -54,15 +47,17 @@ export var init = async () => {
       for (let k = 0; items.length > k; k++) {
         var a = items.item(k);
         a.removeAttribute("selected");
-        a.getElementsByClassName("s-icon")[0].style.display = "none";
+        a.getElementsByClassName("s-icon")[0].style.visibility = "hidden";
       }
       e.target.toggleAttribute("selected", true);
-      e.target.getElementsByClassName("s-icon")[0].style.display =
-        "inline-block";
+      e.target.getElementsByClassName("s-icon")[0].style.visibility = "visible";
       var v = e.target.getAttribute("value");
       var s = schools.filter((d) => {
         return d.id == v;
       });
+      c_school = s[0];
+        console.log(c_school);
+
       var b = document.getElementById("create-meet");
       if (b) b.remove();
       if (s[0].role == "teacher") {
@@ -91,9 +86,6 @@ export var init = async () => {
       button.init();
     };
   }
-  try {
-    document.getElementsByClassName("s-label")[0].click();
-  } catch {}
 
   function showMeetings(data) {
     document.getElementById("mymeet-div").innerHTML = `
@@ -148,7 +140,9 @@ export var init = async () => {
   }
   button.init();
   document.getElementById("s-grade").onchange = () => {
-    var _class_ = document.getElementById("s-grade").value;
+    var select = document.getElementById("s-grade");
+    var _class_ = select.value;
+    var _className_ = select.options[select.selectedIndex].text;
     var all = document.getElementsByClassName("s-label");
     var schoolid;
     for (var i = 0; i < all.length; i++) {
@@ -175,6 +169,7 @@ export var init = async () => {
             ` <div class="mdc-card" style="padding:16px; margin: 5px;">
                 <div class="mdc-card__content">
                   <h4>${m.name}</h4>
+                  class ${_className_}
                 </div>
                 <div class="mdc-card__action-button" tabindex="0">
                   <a class='class-link btn' href='/meet/${m.id}'>Join Now</a>
@@ -184,6 +179,35 @@ export var init = async () => {
         button.init();
       });
   };
+  try {
+    document.getElementsByClassName("s-label")[0].click();
+  } catch {}
+
+  var e = document.getElementById("options");
+  var style = getComputedStyle(e);
+  e.h = parseInt(style.height.slice(0, style.height.length - 2)) + 48 + "px";
+  e.style.maxHeight = "0px";
+  e.w = parseInt(style.width.slice(0, style.width.length - 2)) + 48 + "px";
+  e.style.maxWidth = "0px";
+  document.getElementById("header-img").onclick = function () {
+    if (e.style.maxHeight == "0px") {
+      e.style.maxHeight = e.h;
+      e.style.maxWidth = e.w;
+      e.style.padding = "16px";
+    } else {
+      e.style.maxHeight = "0px";
+      e.style.maxWidth = "0px";
+      e.style.padding = "0px";
+    }
+  };
+  document.addEventListener("click", (e) => {
+    var el = document.getElementById("options");
+    if (!e.target.closest("#options") && e.target.id != "header-img") {
+      el.style.maxHeight = "0px";
+      el.style.maxWidth = "0px";
+      el.style.padding = "0px";
+    }
+  });
 };
 function createClass() {
   var all = document.getElementsByClassName("s-label");
@@ -195,6 +219,9 @@ function createClass() {
   }
   var userid = auth.user.uid;
   var name = prompt("Name of class: ");
+  if (!name) {
+    return;
+  }
   fetch("/newclass", {
     method: "post",
     headers: {
@@ -221,7 +248,7 @@ function createClass() {
     });
 }
 function createMeet() {
-  if (document.getElementById("s-grade").length <= 0) {
+  if (c_school.allclasses.length <= 0) {
     alert("create a class first");
     return;
   }
@@ -229,9 +256,13 @@ function createMeet() {
     document.getElementById("m-create-dlg")
   );
   create_dialog.open();
-  document.getElementById("m-class").innerHTML = document.getElementById(
-    "s-grade"
-  ).innerHTML;
+  document.getElementById("m-class").innerHTML = `
+  ${forEach(
+    c_school.allclasses,
+    (c) => `
+  <option value="${c.id}">${c.name}</option>
+  `
+  )}`;
   document.getElementById("m-create").onsubmit = function (e) {
     e.preventDefault();
     var _class_ = document.getElementById("m-class").value;
@@ -266,7 +297,6 @@ function joinClass(data) {
     document.getElementById("c-join-dlg")
   );
   join_class.open();
-  console.log(data);
   var cls = data.allclasses.filter((v) => {
     return !data.classes.find((e) => e.name == v.name);
   });
@@ -276,7 +306,9 @@ function joinClass(data) {
     document
       .getElementById("c-join")
       .getElementsByTagName("button")[0].disabled = true;
+    document.getElementById("c-grade").hidden = true;
   } else {
+    document.getElementById("c-grade").hidden = false;
     document.getElementById("c-error").innerHTML = "";
     document
       .getElementById("c-join")

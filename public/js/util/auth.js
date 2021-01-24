@@ -15,7 +15,6 @@ export var init = () => {
 };
 
 export var signUp = async (email, pwd, name) => {
-  console.log(email, pwd, name);
   var result = await firebase.auth().createUserWithEmailAndPassword(email, pwd);
   var user = result.user;
   await user.updateProfile({
@@ -41,6 +40,5 @@ export var signOut = () => {
 };
 
 export var signIn = async (email, pwd) => {
-  console.log(email, pwd);
   return await firebase.auth().signInWithEmailAndPassword(email, pwd);
 };
