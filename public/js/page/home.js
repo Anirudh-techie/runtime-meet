@@ -56,8 +56,6 @@ export var init = async () => {
         return d.id == v;
       });
       c_school = s[0];
-        console.log(c_school);
-
       var b = document.getElementById("create-meet");
       if (b) b.remove();
       if (s[0].role == "teacher") {
@@ -244,7 +242,9 @@ function createClass() {
           userid,
           schoolid,
         }),
-      });
+      }).then(()=>{
+          location.reload()
+      })
     });
 }
 function createMeet() {
